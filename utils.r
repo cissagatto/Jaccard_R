@@ -165,7 +165,7 @@ fiCSV <- function(filenames){
   j = 0
   for(j in 1:length(ficsv)){
     a = str_length(ficsv[j])
-    a = a - 18
+    a = a - 17
     ficsv[j] = str_sub(ficsv[j], end = a)  
     j = j + 1
     gc()
