@@ -1,7 +1,7 @@
 ##################################################################################################
 # Elaine Cecilia Gatto | Prof. Dr. Ricardo Cerri | Prof. Dr. Mauri Ferrandin                     #
 # www.professoracissagatto.com.br                                                                #
-# Federal University of São Carlos (UFSCar: https://www2.ufscar.br/) Campus Sao Carlos           #
+# Federal University of SÃ£o Carlos (UFSCar: https://www2.ufscar.br/) Campus Sao Carlos           #
 # Computer Department (DC: https://site.dc.ufscar.br/)                                           #
 # Program of Post Graduation in Computer Science (PPG-CC: http://ppgcc.dc.ufscar.br/)            #
 # Bioinformatics and Machine Learning Group (BIOMAL: http://www.biomal.ufscar.br/)               #
@@ -11,8 +11,8 @@
 
 
 
-##################################################################################################
-# configuração de notação científica                                                             #
+###################################################################################################
+# setando area de trabalho                                                                       #
 ##################################################################################################
 sf = setFolder()
 setwd(sf$Folder)
@@ -22,9 +22,9 @@ FolderRoot = sf$Folder
 
 
 ##################################################################################################
-# configuração de notação científica                                                             #
+# arquivos internos                                                             #
 ##################################################################################################
-source("utils.R")
+source("utils.r")
 source("graficos.R")
 source("top.R")
 
@@ -32,15 +32,16 @@ source("top.R")
 
 
 ##################################################################################################
-# configuração de notação científica                                                             #
+# bibliotecas                                                           #
 ##################################################################################################
 library("philentropy")
 library("stringr")
 
 
 
+
 ##################################################################################################
-# configuração de notação científica                                                             #
+# configuraÃ§Ã£o de notaÃ§Ã£o cientÃ­fica                                                             #
 ##################################################################################################
 options(scipen=30)
 
@@ -48,7 +49,7 @@ options(scipen=30)
 
 
 ##################################################################################################
-# Calculando as Correlações JACCARD para todos os datasets                                       #
+# Calculando as CorrelaÃ§Ãµes JACCARD para todos os datasets                                       #
 ##################################################################################################
 
 # nomes dos arquivos da pasta CSV
@@ -60,14 +61,14 @@ fon = fiCSV(fileNames)
 
 setwd(FolderRoot)
 
-# abrindo arquivo de informações dos datasets
+# abrindo arquivo de informaÃ§Ãµes dos datasets
 datasets = data.frame(read.csv("datasets.csv"))
 
-# Executa para todos os datasets que estão presentes na pasta DATASET
-i = 28
+# Executa para todos os datasets que estÃ£o presentes na pasta DATASET
+i = 1
 for(i in 1:diretorios$n_Datasets){
   
-  cat("\nComecando: ", fileNames[i])
+  cat("\nComecando: ", fileNames[i], "\n")
   
   a = datasets[i,]
   
@@ -79,7 +80,7 @@ for(i in 1:diretorios$n_Datasets){
   # abrindo o dataset corrente
   classes = data.frame(read.csv(fileNames[i]))
   
-  # necessário inverter a matrix para dar o resultado correto
+  # necessÃ¡rio inverter a matrix para dar o resultado correto
   classes_t = t(classes)
   
   # obtendo os nomes das colunas
@@ -88,7 +89,7 @@ for(i in 1:diretorios$n_Datasets){
   Folder4 = paste(diretorios$folderResults, "/", fon[i], sep="")
   dir.create(Folder4)
   
-  # criando e sentando a pasta específica desta medida
+  # criando e sentando a pasta especÃ­fica desta medida
   Folder5 = paste(Folder4, "/", "jaccard", sep="")
   dir.create(Folder5)
   setwd(Folder5)
@@ -96,17 +97,24 @@ for(i in 1:diretorios$n_Datasets){
   matrix_correlation = distance(classes_t, method = "jaccard", use.row.names = TRUE)
   write.csv(matrix_correlation, "matrix_correlation.csv")
   
+  mcNA = is.na(matrix_correlation)
+  write.csv(mcNA, "matrixNA.csv")
+  is.na(matrix_correlation) <- 1
+  
   rownames(matrix_correlation) <- columnsNames
   matrix_correlation2 = as.matrix(matrix_correlation)
   
   matrix_correlation <- reorder_mat_cor(matrix_correlation)
   upper_tri <- get_upper_tri(matrix_correlation)
+  write.csv(upper_tri, "upper_tri.csv")
+  
   melt_mat_cor <- melt(upper_tri, na.rm = TRUE)
   m.ord <- melt_mat_cor[order(melt_mat_cor[,3]),]
   write.csv(m.ord, "melt_order.csv")
   
   mapaDeCalor(fon[i], "jaccard", melt_mat_cor, Folder5)
-  Dendrogramas(fon[i], "jaccard", matrix_correlation2, Folder5, columnsNames, ids)
+  result = Dendrogramas(fon[i], "jaccard", matrix_correlation2, Folder5, columnsNames, ids)
+  write(unlist(result), "result_dendro.txt")
   
   r = top("jaccard", m.ord, columnsNames, Folder5) 
   analise(columnsNames, "jaccard", Folder5) 
@@ -123,8 +131,3 @@ for(i in 1:diretorios$n_Datasets){
   
   cat("\n", fileNames[i], " Finalizado.\n")
 }
-
-
-
-
-

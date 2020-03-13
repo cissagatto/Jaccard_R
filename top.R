@@ -1,7 +1,7 @@
 ##################################################################################################
 # Elaine Cecilia Gatto | Prof. Dr. Ricardo Cerri | Prof. Dr. Mauri Ferrandin                     #
 # www.professoracissagatto.com.br                                                                #
-# Federal University of São Carlos (UFSCar: https://www2.ufscar.br/) Campus Sao Carlos           #
+# Federal University of SÃ£o Carlos (UFSCar: https://www2.ufscar.br/) Campus Sao Carlos           #
 # Computer Department (DC: https://site.dc.ufscar.br/)                                           #
 # Program of Post Graduation in Computer Science (PPG-CC: http://ppgcc.dc.ufscar.br/)            #
 # Bioinformatics and Machine Learning Group (BIOMAL: http://www.biomal.ufscar.br/)               #
@@ -22,12 +22,15 @@ FolderRoot = sf$Folder
 
 
 ##################################################################################################
-# configuração de notação científica                                                             #
+# configuraÃ§Ã£o de notaÃ§Ã£o cientÃ­fica                                                             #
 ##################################################################################################
 options(scipen=30)
 
 
 library("reshape2")
+library("plyr")
+library("dplyr")
+library("AggregateR")
 
 
 
@@ -210,7 +213,7 @@ organizeFiles <- function(measure, folder){
 }
 
 
-# ARRUMAR ISTO AQUI TÁ ERRADO!!
+# ARRUMAR ISTO AQUI TÃ ERRADO!!
 mergeFiles <- function(folderName){
   cosine = data.frame(read.csv("jaccard_limiares2.csv"))
   jaccard = data.frame(read.csv("cosine_limiares2.csv"))

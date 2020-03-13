@@ -1,7 +1,7 @@
 ##################################################################################################
 # Elaine Cecilia Gatto | Prof. Dr. Ricardo Cerri | Prof. Dr. Mauri Ferrandin                     #
 # www.professoracissagatto.com.br                                                                #
-# Federal University of São Carlos (UFSCar: https://www2.ufscar.br/) Campus Sao Carlos           #
+# Federal University of SÃ£o Carlos (UFSCar: https://www2.ufscar.br/) Campus Sao Carlos           #
 # Computer Department (DC: https://site.dc.ufscar.br/)                                           #
 # Program of Post Graduation in Computer Science (PPG-CC: http://ppgcc.dc.ufscar.br/)            #
 # Bioinformatics and Machine Learning Group (BIOMAL: http://www.biomal.ufscar.br/)               #
@@ -44,7 +44,7 @@ setFolder <- function(){
 
 
 ##################################################################################################
-# configuração de notação científica                                                             #
+# configuraÃ§Ã£o de notaÃ§Ã£o cientÃ­fica                                                             #
 ##################################################################################################
 options(scipen=30)
 
@@ -165,14 +165,13 @@ fiCSV <- function(filenames){
   j = 0
   for(j in 1:length(ficsv)){
     a = str_length(ficsv[j])
-    a = a - 17
+    a = a - 18
     ficsv[j] = str_sub(ficsv[j], end = a)  
     j = j + 1
     gc()
   }
   return(ficsv)
 }
-
 
 
 

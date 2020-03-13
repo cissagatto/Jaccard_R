@@ -1,11 +1,11 @@
 ##################################################################################################
 # Elaine Cecilia Gatto | Prof. Dr. Ricardo Cerri | Prof. Dr. Mauri Ferrandin                     #
 # www.professoracissagatto.com.br                                                                #
-# Federal University of S„o Carlos (UFSCar: https://www2.ufscar.br/) Campus Sao Carlos           #
+# Federal University of S√£o Carlos (UFSCar: https://www2.ufscar.br/) Campus Sao Carlos           #
 # Computer Department (DC: https://site.dc.ufscar.br/)                                           #
 # Program of Post Graduation in Computer Science (PPG-CC: http://ppgcc.dc.ufscar.br/)            #
 # Bioinformatics and Machine Learning Group (BIOMAL: http://www.biomal.ufscar.br/)               #
-# Algorithm 4 - Jaccard                                                                          #
+# Algorithm 3 - Gr√°ficos                                                                          #
 ##################################################################################################
 
 
@@ -22,7 +22,7 @@ FolderRoot = sf$Folder
 
 
 ##################################################################################################
-# configuraÁ„o de notaÁ„o cientÌfica                                                             #
+# configura√ß√£o de nota√ß√£o cient√≠fica                                                             #
 ##################################################################################################
 options(scipen=30)
 
@@ -31,7 +31,7 @@ options(scipen=30)
 
 
 ##################################################################################################
-# configuraÁ„o de notaÁ„o cientÌfica                                                             #
+# configura√ß√£o de nota√ß√£o cient√≠fica                                                             #
 ##################################################################################################
 library("ggplot2")
 library("dendextend")
@@ -45,7 +45,7 @@ library("cluster")
 
 
 ##################################################################################################
-# configuraÁ„o de notaÁ„o cientÌfica                                                             #
+# configura√ß√£o de nota√ß√£o cient√≠fica                                                             #
 ##################################################################################################
 source("utils.r")
 
@@ -58,16 +58,15 @@ source("utils.r")
 mapaDeCalor <- function(folderName, measure, melt_mat_cor, folder){
   setwd(folder)
   cat("\nCreating Heat Map! \n")
-  melt_mat_cor = round(melt_mat_cor, 2)
-  jpeg("heatmap_1.jpeg",  width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 200)
-  ggheatmap <- ggplot(melt_mat_cor, aes(Var2, Var1, fill = value)) + geom_tile(color = "white")+
+  jpeg("heatmap_1.jpeg",  width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 100)
+  ggheatmap <- ggplot(melt_mat_cor, aes(Var2, Var1, fill = round(value, 2))) + geom_tile(color = "white")+
     scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
                          midpoint = 0, limit = c(0,1), space = "Lab", name = measure) + theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 8, hjust = 1)) + coord_fixed()
   print(ggheatmap)
   
   heatmap.plot <- ggheatmap + 
-    geom_text(aes(Var2, Var1, label = value), color = "black", size = 1.0) +
+    geom_text(aes(Var2, Var1, label = value), color = "black", size = 0.5) +
     theme(
       axis.title.x = element_blank(),
       axis.title.y = element_blank(),
@@ -96,9 +95,13 @@ Dendrogramas <- function(folderName, measure, matrix_correlation, Folder5, colum
   setwd(Folder5)
   metodos = c("average", "single", "complete", "ward.D", "ward.D2", "mcquitty")
   
+  metodo = c(0)
+  coeficiente = c(0)
+  coefHC = data.frame(metodo, coeficiente)
+  
   i = 1
   for(i in i:length(metodos)){
-    cat("\n| Metodo: ", metodos[i], "\n")
+    cat("\n\n| Metodo: ", metodos[i], "\n")
     
     folder10 = paste(Folder5, "/", metodos[i], sep="")
     dir.create(folder10)
@@ -143,7 +146,7 @@ Dendrogramas <- function(folderName, measure, matrix_correlation, Folder5, colum
     write.csv(data.frame(dend %>% get_nodes_attr("label")), "dend_label.csv")
     
     setwd(FolderG)
-    jpeg("dend_plot_1.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 200)
+    jpeg("dend_plot_1.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 100)
     print(dend %>% hang.dendrogram(hang = -1) %>% plot )
     dev.off()
     cat("\n")
@@ -157,7 +160,7 @@ Dendrogramas <- function(folderName, measure, matrix_correlation, Folder5, colum
       set("nodes_pch", 19) %>% 
       set("nodes_col", c("orange", "black", "plum", NA))
     
-    jpeg("dend_plot_2.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 200)
+    jpeg("dend_plot_2.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 100)
     print(plot(d1))
     dev.off()
     
@@ -166,9 +169,13 @@ Dendrogramas <- function(folderName, measure, matrix_correlation, Folder5, colum
     # HCLUST NORMAL
     
     otter.dendro <- as.dendrogram(hclust(d = as.dist(matrix_correlation), method=metodos[i]))
-    save(dend, file = paste("dhc_", metodos[i], ".RData", sep=""))
+    save(otter.dendro, file = paste("otter_dendro", metodos[i], ".RData", sep=""))
     
     listaDendograma = dendlist(otter.dendro)
+    sink(file="lista_dendograma.txt", type="output")
+    listaDendograma %>% unclass %>% str
+    sink()
+    write(unlist(listaDendograma), paste("listaDend_", metodos[i], ".txt", sep=""))
     
     d = as.dist(matrix_correlation)
     e = as.matrix(d)
@@ -181,11 +188,17 @@ Dendrogramas <- function(folderName, measure, matrix_correlation, Folder5, colum
     sink(file="hc_saida.txt", type="output")
     dendro
     sink()
+    write(unlist(dendro), paste("listaDend_", metodos[i], ".txt", sep=""))
+    save(dendro, file = paste("dendro_", metodos[i], ".RData", sep=""))
     
     write.csv(toString(dendro), paste("hc_", metodos[i], ".csv", sep=""))
     write.csv(hc$merge, paste("hc_merge_", metodos[i], ".csv", sep=""))
     write.csv(hc$height, paste("hc_height_", metodos[i], ".csv", sep=""))
     write.csv(hc$order, paste("hc_order_", metodos[i], ".csv", sep=""))
+    
+    metodo = metodos[i]
+    coeficiente = coef.hclust(hc)
+    coefHC = rbind(coefHC, data.frame(metodo, coeficiente))
     
     dend_data <- dendro_data(dendro, type = "rectangle")
     sink(file="hc_data_saida.txt", type="output")
@@ -195,93 +208,67 @@ Dendrogramas <- function(folderName, measure, matrix_correlation, Folder5, colum
     write.csv(dend_data$segments, paste("hc_segments_", metodos[i], ".csv", sep=""))
     write.csv(dend_data$label, paste("hc_label_", metodos[i], ".csv", sep=""))
     
-    jpeg("hc_plot_1.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 200)
+    jpeg("hc_plot_1.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 100)
     print(plot(dendro))
     dev.off()
     cat("\n")
     
-    jpeg("radial.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 200)
+    jpeg("radial.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 100)
     print(plot(as.phylo(hc), type = "radial", cex = 0.6, no.margin = TRUE))
     dev.off()
     cat("\n")
     
-    jpeg("fan.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 200)
+    jpeg("fan.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 100)
     print(plot(as.phylo(hc), type = "fan", cex = 0.6, no.margin = TRUE))
     dev.off()
     cat("\n")
     
-    jpeg("unroot.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 200)
+    jpeg("unroot.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 100)
     print(plot(as.phylo(hc), type = "unrooted", cex = 0.6, no.margin = TRUE))
     dev.off()
     cat("\n")
     
-    jpeg("cladogram.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 200)
+    jpeg("cladogram.jpeg", width = 2560, height = 2048, units = "px", res = 300, pointsize = 12, quality = 100)
     print(plot(as.phylo(hc), type = "cladogram", cex = 0.6, no.margin = TRUE))
     dev.off()
     cat("\n")
     
-    jpeg("phylogenic.jpeg", width = 2560, height = 2048, units = "px", res = 300, quality = 200)
+    jpeg("phylogenic.jpeg", width = 2560, height = 2048, units = "px", res = 300, quality = 100)
     print(fviz_dend(hc, cex = 0.6, type = "phylogenic", main="", ggtheme=theme_gray()))
     dev.off()
     cat("\n")
     
-    jpeg("hc_plot_2.jpeg", width = 2560, height = 2048, units = "px", res = 300, quality = 200)
+    jpeg("hc_plot_2.jpeg", width = 2560, height = 2048, units = "px", res = 300, quality = 100)
     print(plot(dendro))
     print(with(pvclust:::hc2axes(as.hclust(dendro)), 
                text(x.axis, y.axis, round(y.axis, 2),col = "red", adj = c(0.5, 1.5), cex = 0.5)))
     dev.off()
     cat("\n")
     
-    jpeg("correlograma_1.jpeg", width = 2560, height = 2048, units = "px", res = 300, quality = 200)
-    print(corrgram(matrix_correlation2, order=TRUE, lower.panel=panel.shade, upper.panel=NULL, text.panel=panel.txt)) 
-    dev.off()
-    cat("\n")
+    #jpeg("correlograma_1.jpeg", width = 2560, height = 2048, units = "px", res = 300, quality = 100)
+    #print(corrgram(matrix_correlation2, order=TRUE, lower.panel=panel.shade, upper.panel=NULL, text.panel=panel.txt)) 
+    #dev.off()
+    #cat("\n")
     
-    jpeg("correlograma_2.jpeg", width = 2560, height = 2048, units = "px", res = 300, quality = 200)
+    jpeg("correlograma_2.jpeg", width = 2560, height = 2048, units = "px", res = 300, quality = 100)
     print(ggcorr(matrix_correlation2, label = TRUE, label_color="blue", label_size = 1.5, hjust = 0.75, size = 4, nbreaks = 6))
     dev.off()
     cat("\n")
     
-    jpeg("heatmap_matrix.jpeg", width = 2560, height = 2048, units = "px", res = 300, quality = 200)
+    jpeg("heatmap_matrix.jpeg", width = 2560, height = 2048, units = "px", res = 300, quality = 100)
     print(heatmap(matrix_correlation2, col = cm.colors(256))) 
     dev.off()
     cat("\n")
     
-    jpeg("hc_plot_3.jpeg", width = 2560, height = 2048, units = "px", res = 300, quality = 200)
+    jpeg("hc_plot_3.jpeg", width = 2560, height = 2048, units = "px", res = 300, quality = 100)
     dendro.plot <- ggdendrogram(data = otter.dendro, rotate = TRUE)
     print(dendro.plot)
     dev.off()
     cat("\n")
-    
-    
-    #################################################################################################################### 
-    # AGNES
-    hc_agnes <- agnes(d, method=metodos[i])
-    sink(file="agnes_unclass.txt", type="output")
-    hc_agnes
-    sink()
-    save(dend, file = paste("hc_agnes_", metodos[i], ".RData", sep=""))
-    write.csv(hc_agnes$ac, "agnes_coeficiente.csv")
-    write.csv(hc_agnes$height, "agnes_height.csv")
-    write.csv(hc_agnes$order, "agnes_order.csv")
-    write.csv(hc_agnes$merge, "agnes_merge.csv")
-    write.csv(hc_agnes$order.lab, "agnes_ordem_labels.csv")
-    
-    otter.dendro2 <- as.dendrogram(agnes(d, method=metodos[i]))
-    jpeg("agnes_plot_1.jpeg", width = 2560, height = 2048, units = "px", res = 300, quality = 200)
-    dendro.plot <- ggdendrogram(data = otter.dendro2, rotate = TRUE)
-    print(dendro.plot)
-    dev.off()
-    cat("\n")
-    
-    ####################################################################################################################
-    cophenetic(hc_agnes) 
-    matrizCof = cophenetic(hc_agnes)
-    cor(d,matrizCof)
  
     
     #################################################################################################################### 
-    # clusterizaÁ„o
+    # clusteriza√ß√£o
     k = 1
     for(k in 1:ids$labels){
       cat("\ncluster: ", k)
@@ -296,27 +283,6 @@ Dendrogramas <- function(folderName, measure, matrix_correlation, Folder5, colum
       setwd(FolderT)
       a = data.frame(table(clusters))
       write.table(a, paste("hc_table_", k, ".csv", sep=""), sep=",", col.names = TRUE)
-      
-      k = k + 1
-      gc()
-    }
-    
-    #################################################################################################################### 
-    # clusterizaÁ„o
-    k = 1
-    for(k in 1:ids$labels){
-      cat("\ncluster: ", k)
-      
-      setwd(FolderC)
-      clusters_plot = cutree(hc_agnes, k)
-      clusters = data.frame(cutree(hc, k))
-      names(clusters) = "grupo"
-      clusters2 = clusters[order(clusters$grupo, decreasing = FALSE),]
-      write.csv(clusters, paste("agnes_clusters_", k, ".csv", sep=""))
-      
-      setwd(FolderT)
-      a = data.frame(table(clusters))
-      write.table(a, paste("agnes_table_", k, ".csv", sep=""), sep=",", col.names = TRUE)
       
       k = k + 1
       gc()
