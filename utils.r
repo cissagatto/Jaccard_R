@@ -1,13 +1,32 @@
 ##################################################################################################
 # Elaine Cecilia Gatto | Prof. Dr. Ricardo Cerri | Prof. Dr. Mauri Ferrandin                     #
 # www.professoracissagatto.com.br                                                                #
-# Federal University of São Carlos (UFSCar: https://www2.ufscar.br/) Campus Sao Carlos           #
+# Federal University of Sao Carlos (UFSCar: https://www2.ufscar.br/) Campus Sao Carlos           #
 # Computer Department (DC: https://site.dc.ufscar.br/)                                           #
 # Program of Post Graduation in Computer Science (PPG-CC: http://ppgcc.dc.ufscar.br/)            #
 # Bioinformatics and Machine Learning Group (BIOMAL: http://www.biomal.ufscar.br/)               #
 # Algorithm 1 - UTILS                                                                            #
 ##################################################################################################
 
+
+
+####################################################
+# EXTERNAL LIBRARIES                               #
+####################################################
+library("stringr")
+
+
+
+####################################################
+# INTERNAL LIBRARIES                               #
+####################################################
+
+
+
+##################################################################################################
+# configuraÃ§Ã£o de notaÃ§Ã£o cientÃ?fica                                                        #
+##################################################################################################
+options(scipen=30)
 
 
 
@@ -43,15 +62,6 @@ setFolder <- function(){
 
 
 
-##################################################################################################
-# configuração de notação científica                                                             #
-##################################################################################################
-options(scipen=30)
-
-
-
-
-
 
 ##################################################################################################
 # Function to set the folder according to your operational system                                #
@@ -59,18 +69,6 @@ options(scipen=30)
 directories <- function(){
   
   retorno = list()
-  
-  folderResults = paste(FolderRoot, "/Results", sep="")
-  if(dir.exists(folderResults) == TRUE){
-    setwd(folderResults)
-    dirResults = dir(folderResults)
-    n_Results = length(dirResults)
-  } else {
-    dir.create(folderResults)
-    setwd(folderResults)
-    dirResults = dir(folderResults)
-    n_Results = length(dirResults)
-  }
   
   folderDatasets = paste(FolderRoot, "/Datasets", sep="")
   if(dir.exists(folderDatasets) == TRUE){
@@ -96,56 +94,137 @@ directories <- function(){
     n_IL = length(dirIL)
   }
   
-  folderP = paste(FolderRoot, "/Partitions", sep="")
-  if(dir.exists(folderP) == TRUE){
-    setwd(folderP)
-    dirP = dir(folderP)
-    n_P = length(dirP)
+  folderILS = paste(FolderRoot, "/InstancesPerLabelsSpace", sep="")
+  if(dir.exists(folderILS) == TRUE){
+    setwd(folderILS)
+    dirILS = dir(folderILS)
+    n_ILS = length(dirILS)
   } else {
-    dir.create(folderP)
-    setwd(folderP)
-    dirP = dir(folderP)
-    n_P = length(dirP)
+    dir.create(folderILS)
+    setwd(folderILS)
+    dirILS = dir(folderILS)
+    n_ILS = length(dirILS)
   }
   
-  folderSta = paste(FolderRoot, "/Statistics", sep="")
-  if(dir.exists(folderSta) == TRUE){
-    setwd(folderSta)
-    dirSta = dir(folderSta)
-    n_Sta = length(dirSta)
+  folderResults = paste(FolderRoot, "/Results", sep="")
+  if(dir.exists(folderResults) == TRUE){
+    setwd(folderResults)
+    dirResults = dir(folderResults)
+    n_Results = length(dirResults)
   } else {
-    dir.create(folderSta)
-    setwd(folderSta)
-    dirSta = dir(folderSta)
-    n_Sta = length(dirSta)
+    dir.create(folderResults)
+    setwd(folderResults)
+    dirResults = dir(folderResults)
+    n_Results = length(dirResults)
   }
   
-  # folders
-  retorno$folderResults = folderResults
+  # return folders
   retorno$folderDatasets = folderDatasets
   retorno$folderIL = folderIL
-  retorno$folderP = folderP
-  retorno$folderSta = folderSta
+  retorno$folderILS = folderILS
+  retorno$folderResults = folderResults
   
-  # arquivos
-  retorno$dirResults = dirResults
+  # return files
   retorno$dirDatasets = dirDatasets
   retorno$dirIL = dirIL
-  retorno$dirP = dirP
-  retorno$dirSta = dirSta
+  retorno$dirILS = dirILS
+  retorno$dirResults = dirResults
   
   # return numbers
-  retorno$n_Results = n_Results
   retorno$n_Datasets = n_Datasets
   retorno$n_IL = n_IL
-  retorno$n_P = n_P
-  retorno$n_Sta = n_Sta
+  retorno$n_ILS = n_ILS
+  retorno$n_Results = n_Results
   
   return(retorno)
   
   gc()
 }
 
+
+
+##################################################################################################
+# FUNCTION INFO DATA SET                                                                         #
+# Objective:                                                                                     #
+#     Gets the information that is in the "datsets.csv" file.                                    #  
+# Parameters:                                                                                    #
+#     dataset: the specific dataset                                                              #
+# Return:                                                                                        #
+#     Everything in the spreadsheet                                                              #
+##################################################################################################
+infoDataSet <- function(dataset){
+  cat("\n FUNCAO INFO DATA SET \n")
+  retorno = list()
+  retorno$id = dataset$ID
+  retorno$name = dataset$Name
+  retorno$instances = dataset$Instances
+  retorno$inputs = dataset$Inputs
+  retorno$labels = dataset$Labels
+  retorno$LabelsSets = dataset$LabelsSets
+  retorno$single = dataset$Single
+  retorno$maxfreq = dataset$MaxFreq
+  retorno$card = dataset$Card
+  retorno$dens = dataset$Dens
+  retorno$mean = dataset$Mean
+  retorno$scumble = dataset$Scumble
+  retorno$tcs = dataset$TCS
+  retorno$attStart = dataset$AttStart
+  retorno$attEnd = dataset$AttEnd
+  retorno$labStart = dataset$LabStart
+  retorno$labEnd = dataset$LabEnd
+  return(retorno)
+}
+
+
+
+##################################################################################################
+# FUNCTION FOLD NAMES                                                                            #
+# Objective:                                                                                     #
+#     Create folder names for each dataset                                                       #
+# Parameters:                                                                                    #
+#     fileNames: a vector with file names                                                        #
+# Return:                                                                                        #
+#     folderNames: a vector with folder names                                                    #
+#     numberDataSets: number of files within folder                                              #
+##################################################################################################
+folderNames <- function(filenames, tipo){
+  folderNames = filenames
+  # _labels_train.csv
+  j = 0
+  for(j in 1:length(folderNames)){
+    a = str_length(folderNames[j])
+    a = a - 17
+    folderNames[j] = str_sub(folderNames[j], end = a)  
+    j = j + 1
+    gc()
+  }  
+  return(folderNames)
+}
+
+
+
+
+##################################################################################################
+# FUNCTION FOLD NAMES                                                                            #
+# Objective:                                                                                     #
+#     Create folder names for each dataset                                                       #
+# Parameters:                                                                                    #
+#     fileNames: a vector with file names                                                        #
+# Return:                                                                                        #
+#     folderNames: a vector with folder names                                                    #
+#     numberDataSets: number of files within folder                                              #
+##################################################################################################
+fileNamesFinal <- function(filenames){
+  fnf = filenames
+  j = 1
+  for(j in 1:length(fnf)){
+    str = paste(fnf[j], ".csv", sep="")
+    fnf[j] = str
+    j = j + 1
+    gc()
+  }
+  return(fnf)
+}
 
 
 
@@ -171,45 +250,4 @@ fiCSV <- function(filenames){
     gc()
   }
   return(ficsv)
-}
-
-
-
-
-##################################################################################################
-# FUNCTION INFO DATA SET                                                                         #
-# Objective:                                                                                     #
-#     Gets the information that is in the "datsets.csv" file.                                    #  
-# Parameters:                                                                                    #
-#     dataset: the specific dataset                                                              #
-# Return:                                                                                        #
-#     Everything in the spreadsheet                                                              #
-##################################################################################################
-infoDataSet <- function(dataset){
-  retorno = list()
-  retorno$id = dataset$ID
-  retorno$ds = dataset$DS
-  retorno$name = dataset$Name
-  retorno$domain = dataset$Domain
-  retorno$instances = dataset$Instances
-  retorno$labels = dataset$Labels
-  retorno$predictiveAttributes = dataset$PredictiveAttributes
-  retorno$attributesTotal = dataset$AttributesTotal
-  retorno$attStart = dataset$AttStart
-  retorno$attEnd = dataset$AttEnd
-  retorno$labStart = dataset$LabStart
-  retorno$labEnd = dataset$LabEnd
-  retorno$nominal = dataset$Nominal
-  retorno$numeric = dataset$Numeric
-  retorno$cardinality = dataset$Dardinality
-  retorno$density = dataset$Density
-  retorno$distinct = dataset$Distinct
-  retorno$dimensionality = dataset$Dimensionality
-  retorno$xn = dataset$xn
-  retorno$yn = dataset$yn
-  retorno$gridn = dataset$gridn
-  retorno$xt = dataset$xt
-  retorno$yt = dataset$yt
-  retorno$gridt = dataset$gridt
-  return(retorno)
 }
