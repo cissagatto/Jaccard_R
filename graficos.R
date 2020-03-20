@@ -1,11 +1,11 @@
 ##################################################################################################
 # Elaine Cecilia Gatto | Prof. Dr. Ricardo Cerri | Prof. Dr. Mauri Ferrandin                     #
 # www.professoracissagatto.com.br                                                                #
-# Federal University of São Carlos (UFSCar: https://www2.ufscar.br/) Campus Sao Carlos           #
+# Federal University of Sao Carlos (UFSCar: https://www2.ufscar.br/) Campus Sao Carlos           #
 # Computer Department (DC: https://site.dc.ufscar.br/)                                           #
 # Program of Post Graduation in Computer Science (PPG-CC: http://ppgcc.dc.ufscar.br/)            #
 # Bioinformatics and Machine Learning Group (BIOMAL: http://www.biomal.ufscar.br/)               #
-# Algorithm 3 - Gráficos                                                                          #
+# Algorithm 3 - Graficos                                                                         #
 ##################################################################################################
 
 
@@ -22,7 +22,7 @@ FolderRoot = sf$Folder
 
 
 ##################################################################################################
-# configuração de notação científica                                                             #
+# configuracao de notacao cientifica                                                             #
 ##################################################################################################
 options(scipen=30)
 
@@ -31,7 +31,7 @@ options(scipen=30)
 
 
 ##################################################################################################
-# configuração de notação científica                                                             #
+# configuracao de notacao cientifica   n                                                         #
 ##################################################################################################
 library("ggplot2")
 library("dendextend")
@@ -44,8 +44,10 @@ library("ggdendro")
 library("cluster")
 
 
+
+
 ##################################################################################################
-# configuração de notação científica                                                             #
+# configuracao de notacao cientifica                                                             #
 ##################################################################################################
 source("utils.r")
 
@@ -53,7 +55,7 @@ source("utils.r")
 
 
 ##################################################################################################
-#                                                              #
+#                                                                                                #
 ##################################################################################################
 mapaDeCalor <- function(folderName, measure, melt_mat_cor, folder){
   setwd(folder)
@@ -86,7 +88,7 @@ mapaDeCalor <- function(folderName, measure, melt_mat_cor, folder){
 
 
 ##################################################################################################
-#                                                              #
+#                                                                                               #
 ##################################################################################################
 Dendrogramas <- function(folderName, measure, matrix_correlation, Folder5, columnsNames, ids){
   
@@ -268,7 +270,7 @@ Dendrogramas <- function(folderName, measure, matrix_correlation, Folder5, colum
  
     
     #################################################################################################################### 
-    # clusterização
+    # clusterizacao
     k = 1
     for(k in 1:ids$labels){
       cat("\ncluster: ", k)
@@ -291,6 +293,9 @@ Dendrogramas <- function(folderName, measure, matrix_correlation, Folder5, colum
     i = i + 1
     gc()
   }
+  
+  setwd(Folder5)
+  write.csv(coefHC, "coeficiente.csv")
   
   retorno$folderG = FolderG
   retorno$folderT = FolderT
@@ -368,5 +373,3 @@ OptimalNumberClusters <- function(classes, ids){
   
   cat("\n|========== END FUNCTION: OPTIMAL NUMBER CLUSTERS ==========|\n")
 }
-
-
